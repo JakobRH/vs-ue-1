@@ -1,12 +1,24 @@
 package dslab.monitoring;
 
+import at.ac.tuwien.dsg.orvell.Shell;
+import at.ac.tuwien.dsg.orvell.StopShellException;
+import at.ac.tuwien.dsg.orvell.annotation.Command;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 
 import dslab.ComponentFactory;
 import dslab.util.Config;
+import java.net.DatagramSocket;
+import java.net.SocketException;
+import java.util.Map;
 
 public class MonitoringServer implements IMonitoringServer {
+
+    private Config config;
+    private DatagramSocket datagramSocket;
+    private MonitoringStatistics statistics;
+    private Shell shell;
 
     /**
      * Creates a new server instance.
@@ -17,32 +29,60 @@ public class MonitoringServer implements IMonitoringServer {
      * @param out the output stream to write console output to
      */
     public MonitoringServer(String componentId, Config config, InputStream in, PrintStream out) {
-        // TODO
+        this.config = config;
+        this.statistics = new MonitoringStatistics();
+
+        shell = new Shell(in, out);
+        shell.register(this);
     }
 
     @Override
     public void run() {
-        // TODO
+
+        try {
+            datagramSocket = new DatagramSocket(config.getInt("udp.port"));
+
+            new MonitoringListenerThread(datagramSocket, statistics).start();
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot listen on UDP port.", e);
+        }
+                shell.run();
     }
 
+    @Command
     @Override
     public void addresses() {
-        // TODO
+        Map<String , Integer> addresses = statistics.getAddresses();
+        shell.out().flush();
+
+        for(Map.Entry<String ,Integer> entry : addresses.entrySet()){
+            String key = entry.getKey();
+            Integer value = entry.getValue();
+            shell.out().println(key + " " + value);
+        }
     }
 
+    @Command
     @Override
     public void servers() {
-        // TODO
+        Map<String , Integer> servers = statistics.getServers();
+
+        for(Map.Entry<String ,Integer> entry : servers.entrySet()){
+            String key = entry.getKey();
+            Integer value = entry.getValue();
+            shell.out().println(key + " " + value);
+        }
     }
 
+    @Command
     @Override
     public void shutdown() {
-        // TODO
+        datagramSocket.close();
+        throw new StopShellException();
     }
 
     public static void main(String[] args) throws Exception {
         IMonitoringServer server = ComponentFactory.createMonitoringServer(args[0], System.in, System.out);
         server.run();
     }
-
 }

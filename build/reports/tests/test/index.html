@@ -20,13 +20,13 @@
 <tr>
 <td>
 <div class="infoBox" id="tests">
-<div class="counter">11</div>
+<div class="counter">1</div>
 <p>tests</p>
 </div>
 </td>
 <td>
 <div class="infoBox" id="failures">
-<div class="counter">11</div>
+<div class="counter">0</div>
 <p>failures</p>
 </div>
 </td>
@@ -38,7 +38,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">24.098s</div>
+<div class="counter">6.082s</div>
 <p>duration</p>
 </div>
 </td>
@@ -47,8 +47,8 @@
 </div>
 </td>
 <td>
-<div class="infoBox failures" id="successRate">
-<div class="percent">0%</div>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
 <p>successful</p>
 </div>
 </td>
@@ -58,65 +58,13 @@
 <div id="tabs">
 <ul class="tabLinks">
 <li>
-<a href="#tab0">Failed tests</a>
+<a href="#tab0">Packages</a>
 </li>
 <li>
-<a href="#tab1">Packages</a>
-</li>
-<li>
-<a href="#tab2">Classes</a>
+<a href="#tab1">Classes</a>
 </li>
 </ul>
 <div id="tab0" class="tab">
-<h2>Failed tests</h2>
-<ul class="linkList">
-<li>
-<a href="classes/dslab.mailbox.MailboxServerProtocolTest.html">MailboxServerProtocolTest</a>.
-<a href="classes/dslab.mailbox.MailboxServerProtocolTest.html#acceptDmtpMessage_listDmapMessage">acceptDmtpMessage_listDmapMessage</a>
-</li>
-<li>
-<a href="classes/dslab.mailbox.MailboxServerProtocolTest.html">MailboxServerProtocolTest</a>.
-<a href="classes/dslab.mailbox.MailboxServerProtocolTest.html#dmtpMessage_withUnknownRecipient_returnsError">dmtpMessage_withUnknownRecipient_returnsError</a>
-</li>
-<li>
-<a href="classes/dslab.mailbox.MailboxServerProtocolTest.html">MailboxServerProtocolTest</a>.
-<a href="classes/dslab.mailbox.MailboxServerProtocolTest.html#loginAndLogout_withValidLogin">loginAndLogout_withValidLogin</a>
-</li>
-<li>
-<a href="classes/dslab.mailbox.MailboxServerProtocolTest.html">MailboxServerProtocolTest</a>.
-<a href="classes/dslab.mailbox.MailboxServerProtocolTest.html#login_withInvalidLogin_returnsError">login_withInvalidLogin_returnsError</a>
-</li>
-<li>
-<a href="classes/dslab.mailbox.MailboxServerTest.html">MailboxServerTest</a>.
-<a href="classes/dslab.mailbox.MailboxServerTest.html#runAndShutdownTransferServer_createsAndStopsTcpSocketCorrectly">runAndShutdownTransferServer_createsAndStopsTcpSocketCorrectly</a>
-</li>
-<li>
-<a href="classes/dslab.monitoring.MonitoringServerProtocolTest.html">MonitoringServerProtocolTest</a>.
-<a href="classes/dslab.monitoring.MonitoringServerProtocolTest.html#addresses_returnsCorrectStatistics">addresses_returnsCorrectStatistics</a>
-</li>
-<li>
-<a href="classes/dslab.monitoring.MonitoringServerProtocolTest.html">MonitoringServerProtocolTest</a>.
-<a href="classes/dslab.monitoring.MonitoringServerProtocolTest.html#servers_returnsCorrectStatistics">servers_returnsCorrectStatistics</a>
-</li>
-<li>
-<a href="classes/dslab.monitoring.MonitoringServerTest.html">MonitoringServerTest</a>.
-<a href="classes/dslab.monitoring.MonitoringServerTest.html#runAndShutdownMonitoringServer_createsAndStopsUdpSocketCorrectly">runAndShutdownMonitoringServer_createsAndStopsUdpSocketCorrectly</a>
-</li>
-<li>
-<a href="classes/dslab.transfer.TransferServerProtocolTest.html">TransferServerProtocolTest</a>.
-<a href="classes/dslab.transfer.TransferServerProtocolTest.html#defaultDmtpInteractionTest">defaultDmtpInteractionTest</a>
-</li>
-<li>
-<a href="classes/dslab.transfer.TransferServerProtocolTest.html">TransferServerProtocolTest</a>.
-<a href="classes/dslab.transfer.TransferServerProtocolTest.html#sendWithoutRecipient_returnsErrorOnSend">sendWithoutRecipient_returnsErrorOnSend</a>
-</li>
-<li>
-<a href="classes/dslab.transfer.TransferServerTest.html">TransferServerTest</a>.
-<a href="classes/dslab.transfer.TransferServerTest.html#runAndShutdownTransferServer_createsAndStopsTcpSocketCorrectly">runAndShutdownTransferServer_createsAndStopsTcpSocketCorrectly</a>
-</li>
-</ul>
-</div>
-<div id="tab1" class="tab">
 <h2>Packages</h2>
 <table>
 <thead>
@@ -131,39 +79,19 @@
 </thead>
 <tbody>
 <tr>
-<td class="failures">
-<a href="packages/dslab.mailbox.html">dslab.mailbox</a>
-</td>
-<td>5</td>
-<td>5</td>
-<td>0</td>
-<td>12.047s</td>
-<td class="failures">0%</td>
-</tr>
-<tr>
-<td class="failures">
+<td class="success">
 <a href="packages/dslab.monitoring.html">dslab.monitoring</a>
 </td>
-<td>3</td>
-<td>3</td>
+<td>1</td>
 <td>0</td>
-<td>6.023s</td>
-<td class="failures">0%</td>
-</tr>
-<tr>
-<td class="failures">
-<a href="packages/dslab.transfer.html">dslab.transfer</a>
-</td>
-<td>3</td>
-<td>3</td>
 <td>0</td>
-<td>6.028s</td>
-<td class="failures">0%</td>
+<td>6.082s</td>
+<td class="success">100%</td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="tab2" class="tab">
+<div id="tab1" class="tab">
 <h2>Classes</h2>
 <table>
 <thead>
@@ -178,64 +106,14 @@
 </thead>
 <tbody>
 <tr>
-<td class="failures">
-<a href="classes/dslab.mailbox.MailboxServerProtocolTest.html">dslab.mailbox.MailboxServerProtocolTest</a>
-</td>
-<td>4</td>
-<td>4</td>
-<td>0</td>
-<td>12.046s</td>
-<td class="failures">0%</td>
-</tr>
-<tr>
-<td class="failures">
-<a href="classes/dslab.mailbox.MailboxServerTest.html">dslab.mailbox.MailboxServerTest</a>
-</td>
-<td>1</td>
-<td>1</td>
-<td>0</td>
-<td>0.001s</td>
-<td class="failures">0%</td>
-</tr>
-<tr>
-<td class="failures">
-<a href="classes/dslab.monitoring.MonitoringServerProtocolTest.html">dslab.monitoring.MonitoringServerProtocolTest</a>
-</td>
-<td>2</td>
-<td>2</td>
-<td>0</td>
-<td>6.017s</td>
-<td class="failures">0%</td>
-</tr>
-<tr>
-<td class="failures">
+<td class="success">
 <a href="classes/dslab.monitoring.MonitoringServerTest.html">dslab.monitoring.MonitoringServerTest</a>
 </td>
 <td>1</td>
-<td>1</td>
 <td>0</td>
-<td>0.006s</td>
-<td class="failures">0%</td>
-</tr>
-<tr>
-<td class="failures">
-<a href="classes/dslab.transfer.TransferServerProtocolTest.html">dslab.transfer.TransferServerProtocolTest</a>
-</td>
-<td>2</td>
-<td>2</td>
 <td>0</td>
-<td>6.027s</td>
-<td class="failures">0%</td>
-</tr>
-<tr>
-<td class="failures">
-<a href="classes/dslab.transfer.TransferServerTest.html">dslab.transfer.TransferServerTest</a>
-</td>
-<td>1</td>
-<td>1</td>
-<td>0</td>
-<td>0.001s</td>
-<td class="failures">0%</td>
+<td>6.082s</td>
+<td class="success">100%</td>
 </tr>
 </tbody>
 </table>
@@ -248,7 +126,7 @@
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="http://www.gradle.org">Gradle 6.6.1</a> at 13.10.2020, 18:16:33</p>
+<a href="http://www.gradle.org">Gradle 6.6.1</a> at 15.10.2020, 16:19:37</p>
 </div>
 </div>
 </body>

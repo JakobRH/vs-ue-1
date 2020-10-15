@@ -49,6 +49,7 @@ public class MonitoringServerTest extends TestBase {
         try {
             LOG.info("Waiting for thread to stop for component " + component);
             componentThread.join();
+
         } catch (InterruptedException e) {
             err.addError(new AssertionError("Monitoring server was not terminated correctly"));
         }
