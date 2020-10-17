@@ -16,13 +16,13 @@ dslab/util/Dmtp.java
  dslab.util.Dmtp
 dslab/monitoring/MonitoringServer.java
  dslab.monitoring.MonitoringServer
-dslab/transfer/TransferServer.java
- dslab.transfer.TransferServer
-dslab/ComponentFactory.java
- dslab.ComponentFactory
-dslab/transfer/TransferListenerThread.java
- dslab.transfer.TransferListenerThread
 dslab/transfer/MessageForwardingThread.java
  dslab.transfer.MessageForwardingThread
+dslab/ComponentFactory.java
+ dslab.ComponentFactory
+dslab/transfer/TransferServer.java
+ dslab.transfer.TransferServer
+dslab/transfer/TransferListenerThread.java
+ dslab.transfer.TransferListenerThread
 dslab/transfer/RequestThread.java
  dslab.transfer.RequestThread

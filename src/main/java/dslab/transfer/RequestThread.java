@@ -63,6 +63,7 @@ public class RequestThread implements Runnable {
 
                 if (request.equals("quit")) {
                     writer.println("ok bye");
+                    writer.flush();
                     break;
                 }
 
