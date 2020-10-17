@@ -1,12 +1,11 @@
 package dslab.transfer;
 
+import dslab.util.Config;
 import dslab.util.Dmtp;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -15,10 +14,12 @@ public class RequestThread implements Runnable {
     private ExecutorService messageForwardingExecutorService = Executors.newFixedThreadPool(10);
     private Socket socket;
     private Dmtp dmtp = new Dmtp();
+    private Config config;
 
-    public RequestThread(Socket socket, ExecutorService messageForwardingExecutorService) {
+    public RequestThread(Socket socket, ExecutorService messageForwardingExecutorService, Config config) {
         this.messageForwardingExecutorService = messageForwardingExecutorService;
         this.socket = socket;
+        this.config = config;
     }
 
 
@@ -40,7 +41,7 @@ public class RequestThread implements Runnable {
 
                 if (!beginFlag && !request.equals("begin")) {
                     writer.println("error wrong start of dmtp");
-                    closeSocket();
+                    break;
                 }
 
                 if (request.equals("begin")) {
@@ -57,12 +58,12 @@ public class RequestThread implements Runnable {
                         writer.flush();
                         continue;
                     }
-                    messageForwardingExecutorService.submit(new MessageForwardingThread(dmtp));
+                    messageForwardingExecutorService.submit(new MessageForwardingThread(dmtp, config));
                 }
 
                 if (request.equals("quit")) {
                     writer.println("ok bye");
-                    closeSocket();
+                    break;
                 }
 
                 response = checkRequest(request);
@@ -72,12 +73,23 @@ public class RequestThread implements Runnable {
                 writer.flush();
 
                 if (response.equals("error  protocol  error")) {
-                    closeSocket();
+                    break;
                 }
             }
 
+        } catch (SocketException e) {
+            System.out.println("SocketException while handling socket: " + e.getMessage());
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new UncheckedIOException(e);
+        } finally {
+            if (socket != null && !socket.isClosed()) {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    // Ignored because we cannot handle it
+                }
+            }
+
         }
 
 
@@ -104,13 +116,5 @@ public class RequestThread implements Runnable {
             return "ok";
         }
         return "error  protocol  error";
-    }
-
-    private void closeSocket() {
-        try {
-            socket.close();
-        } catch (IOException ioe) {
-            System.out.println("Error closing client connection");
-        }
     }
 }

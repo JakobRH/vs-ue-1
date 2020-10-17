@@ -1,6 +1,7 @@
 package dslab.transfer;
 
 import at.ac.tuwien.dsg.orvell.Shell;
+import at.ac.tuwien.dsg.orvell.StopShellException;
 import at.ac.tuwien.dsg.orvell.annotation.Command;
 import dslab.monitoring.MonitoringStatistics;
 import java.io.IOException;
@@ -39,7 +40,7 @@ public class TransferServer implements ITransferServer, Runnable {
         try {
             serverSocket = new ServerSocket(config.getInt("tcp.port"));
             // handle incoming connections from client in a separate thread
-            new TransferListenerThread(serverSocket).start();
+            new TransferListenerThread(serverSocket, config).start();
         } catch (IOException e) {
             throw new UncheckedIOException("Error while creating server socket", e);
         }
@@ -50,7 +51,12 @@ public class TransferServer implements ITransferServer, Runnable {
     @Command
     @Override
     public void shutdown() {
-        // TODO
+        try {
+            serverSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        throw new StopShellException();
     }
 
     public static void main(String[] args) throws Exception {
