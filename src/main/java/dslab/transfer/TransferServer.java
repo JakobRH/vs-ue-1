@@ -20,6 +20,8 @@ public class TransferServer implements ITransferServer, Runnable {
     private Config config;
     private ServerSocket serverSocket;
     private Shell shell;
+    private ExecutorService requestExecutorService = Executors.newFixedThreadPool(10);
+    private ExecutorService messageForwardingExecutorService = Executors.newFixedThreadPool(10);
     /**
      * Creates a new server instance.
      *
@@ -35,12 +37,15 @@ public class TransferServer implements ITransferServer, Runnable {
         shell.register(this);
     }
 
+    /**
+     * creates serversocket and starts listenerthread, starts shell
+     */
     @Override
     public void run() {
         try {
             serverSocket = new ServerSocket(config.getInt("tcp.port"));
             // handle incoming connections from client in a separate thread
-            new TransferListenerThread(serverSocket, config).start();
+            new TransferListenerThread(serverSocket, config, requestExecutorService, messageForwardingExecutorService).start();
         } catch (IOException e) {
             throw new UncheckedIOException("Error while creating server socket", e);
         }
@@ -48,10 +53,15 @@ public class TransferServer implements ITransferServer, Runnable {
         shell.run();
     }
 
+    /**
+     * closes the executorservices and the socket, throws stopshellexecution to shutdown this application
+     */
     @Command
     @Override
     public void shutdown() {
         try {
+            requestExecutorService.shutdownNow();
+            messageForwardingExecutorService.shutdownNow();
             serverSocket.close();
         } catch (IOException e) {
             e.printStackTrace();

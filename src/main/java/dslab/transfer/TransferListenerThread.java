@@ -12,16 +12,26 @@ import java.util.concurrent.Executors;
 
 public class TransferListenerThread extends Thread {
 
-    private ExecutorService requestExecutorService = Executors.newFixedThreadPool(10);
-    private ExecutorService messageForwardingExecutorService = Executors.newFixedThreadPool(10);
+    private ExecutorService requestExecutorService;
+    private ExecutorService messageForwardingExecutorService;
     private ServerSocket serverSocket;
     private Config config;
 
-    public TransferListenerThread(ServerSocket serverSocket, Config config) {
+    /**
+     * creates new Trasnferlistener
+     * @param serverSocket socket to wait for new connection
+     * @param config cnofig to pass to new created threads
+     */
+    public TransferListenerThread(ServerSocket serverSocket, Config config, ExecutorService requestExecutorService, ExecutorService messageForwardingExecutorService) {
         this.serverSocket = serverSocket;
         this.config = config;
+        this.requestExecutorService = requestExecutorService;
+        this.messageForwardingExecutorService = messageForwardingExecutorService;
     }
 
+    /**
+     * waits for new connection on serversocket, then creates new socket and starts a thread to handle the connection
+     */
     public void run() {
         try {
 
@@ -38,4 +48,5 @@ public class TransferListenerThread extends Thread {
             throw new UncheckedIOException(e);
         }
     }
+
 }

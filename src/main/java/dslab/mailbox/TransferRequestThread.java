@@ -1,39 +1,24 @@
-package dslab.transfer;
+package dslab.mailbox;
 
-import dslab.util.Config;
+import dslab.transfer.MessageForwardingThread;
 import dslab.util.DmtpMessage;
 
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.concurrent.ExecutorService;
 
-/**
- * represents thread to handle a client connection to the transferserver
- */
-public class RequestThread implements Runnable {
+public class TransferRequestThread implements Runnable {
 
-    private ExecutorService messageForwardingExecutorService;
+    private UserData userData;
     private Socket socket;
     private DmtpMessage dmtpMessage = new DmtpMessage();
-    private Config config;
 
-    /**
-     * creates new RequestThread
-     * @param socket socket on which the connection to the client is based
-     * @param messageForwardingExecutorService executorservice to handle the threads of messageforwarding
-     * @param config config to pass on messageforwarding threads
-     */
-    public RequestThread(Socket socket, ExecutorService messageForwardingExecutorService, Config config) {
-        this.messageForwardingExecutorService = messageForwardingExecutorService;
+    public TransferRequestThread(Socket socket,UserData userData) {
         this.socket = socket;
-        this.config = config;
+        this.userData = userData;
     }
 
-
-    /**
-     * method that exchanges messages with the client via dmtp
-     */
+    @SuppressWarnings("DuplicatedCode")
     @Override
     public void run() {
         try {
@@ -57,6 +42,7 @@ public class RequestThread implements Runnable {
                 //break leads to finally block which closes connection
                 if (!beginFlag && !request.equals("begin")) {
                     writer.println("error wrong start of dmtp");
+                    writer.flush();
                     break;
                 }
 
@@ -67,9 +53,17 @@ public class RequestThread implements Runnable {
                     continue;
                 }
 
-                //when send command is received, the dmtp object will be checked
-                //if dmtp object is correct a new thread will be started to handle the messageforwarding
-                //otherwise responds with error message and continues to wait for new request
+                if (request.split(" ", 2)[0].equals("to")) {
+                    dmtpMessage.setTo(request.split(" ", 2)[1]);
+                    if(!userAvailable()){
+                        writer.println("error no recipient known");
+                        writer.flush();
+                        break;
+                    }
+                    writer.println( "ok " + request.split(" ", 2)[1].split(",").length);
+                    writer.flush();
+                }
+
                 if (request.equals("send")) {
                     String dmtpStatus = dmtpMessage.isValidToSend();
                     if (!dmtpStatus.equals("sendable")) {
@@ -77,9 +71,9 @@ public class RequestThread implements Runnable {
                         writer.flush();
                         continue;
                     }
+                    userData.addMessage(dmtpMessage);
                     writer.println("ok");
                     writer.flush();
-                    messageForwardingExecutorService.submit(new MessageForwardingThread(dmtpMessage, config));
                     continue;
                 }
 
@@ -126,13 +120,10 @@ public class RequestThread implements Runnable {
      * @param request
      * @return
      */
+    @SuppressWarnings("DuplicatedCode")
     private String checkRequest(String request) {
         String[] splitRequest = request.split(" ", 2);
 
-        if (splitRequest[0].equals("to")) {
-            dmtpMessage.setTo(splitRequest[1]);
-            return "ok " + splitRequest[1].split(",").length;
-        }
         if (splitRequest[0].equals("from")) {
             dmtpMessage.setFrom(splitRequest[1]);
             return "ok";
@@ -146,5 +137,12 @@ public class RequestThread implements Runnable {
             return "ok";
         }
         return "error  protocol  error";
+    }
+
+    private boolean userAvailable(){
+        for(String userId : dmtpMessage.getTo().split(",")){
+            if(userData.contains(userId)) return true;
+        }
+        return false;
     }
 }
