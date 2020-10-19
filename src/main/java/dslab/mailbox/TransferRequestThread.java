@@ -58,16 +58,18 @@ public class TransferRequestThread extends Thread {
                     continue;
                 }
 
-                if (request.split(" ", 2)[0].equals("to")) {
+                if (request.startsWith("to")) {
                     dmtpMessage.setTo(request.split(" ", 2)[1]);
                     ArrayList<String> unknownRecipients = userAvailable();
                     if(!unknownRecipients.isEmpty()){
-                        writer.println("error  unknown  recipient" + String.join(" ",unknownRecipients));
+                        writer.println("error unknown  recipient " + String.join(" ",unknownRecipients));
                         writer.flush();
-                        break;
+                        dmtpMessage.setTo(null);
+                        continue;
                     }
-                    writer.println( "ok " + request.split(" ", 2)[1].split(",").length);
+                    writer.println( "ok " + dmtpMessage.getTo().split(",").length);
                     writer.flush();
+                    continue;
                 }
 
                 if (request.equals("send")) {
@@ -92,7 +94,6 @@ public class TransferRequestThread extends Thread {
 
                 response = checkRequest(request);
 
-                // print request
                 writer.println(response);
                 writer.flush();
 
@@ -147,7 +148,7 @@ public class TransferRequestThread extends Thread {
     private ArrayList<String> userAvailable(){
         ArrayList<String> result = new ArrayList<>();
         for(String userId : dmtpMessage.getTo().split(",")){
-            if(!userData.contains(userId))
+            if(!userData.contains(userId.split("@")[0]))
             {
                 result.add(userId);
             };

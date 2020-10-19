@@ -38,7 +38,6 @@ public class UserRequestThread extends Thread {
                 if (request.equals("")) {
                     continue;
                 }
-                String response;
 
                 if (request.startsWith("login")) {
                     if(loggedIn){
@@ -46,8 +45,8 @@ public class UserRequestThread extends Thread {
                         writer.flush();
                         continue;
                     }
-                    String userId = request.split(" ")[0];
-                    String pw = request.split(" ")[1];
+                    String userId = request.split(" ")[1];
+                    String pw = request.split(" ")[2];
                     String loginResponse = userData.login(userId, pw);
                     writer.println(loginResponse);
                     writer.flush();
@@ -56,6 +55,12 @@ public class UserRequestThread extends Thread {
                         this.userId = userId;
                     }
                     continue;
+                }
+
+                if(request.equals("quit")){
+                    writer.println("ok bye");
+                    writer.flush();
+                    break;
                 }
 
                 if (!loggedIn){
@@ -73,7 +78,7 @@ public class UserRequestThread extends Thread {
                 }
 
                 if(request.startsWith("show")){
-                    String messageId = request.split(" ")[2];
+                    String messageId = request.split(" ")[1];
                     ArrayList<String> list = userData.show(userId, messageId);
                     for(String entry : list){
                         writer.println(entry);
@@ -82,9 +87,9 @@ public class UserRequestThread extends Thread {
                 }
 
                 if(request.startsWith("delete")){
-                    String messageId = request.split(" ")[2];
-                    String repsonse = userData.delete(userId, messageId);
-                    writer.println(repsonse);
+                    String messageId = request.split(" ")[1];
+                    String response = userData.delete(userId, messageId);
+                    writer.println(response);
                     writer.flush();
 
                 }
@@ -95,12 +100,6 @@ public class UserRequestThread extends Thread {
                     writer.println("ok");
                     writer.flush();
                     continue;
-                }
-
-                if(request.equals("quit")){
-                    writer.println("ok bye");
-                    writer.flush();
-                    break;
                 }
 
             }

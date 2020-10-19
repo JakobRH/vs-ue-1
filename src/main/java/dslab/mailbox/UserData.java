@@ -22,7 +22,7 @@ public class UserData {
 
         for(String userId : dmtpMessage.getTo().split(",")){
             for(MailBoxUser user : user){
-                if(user.getUserId().equals(userId)){
+                if(user.getUserId().equals(userId.split("@")[0])){
                     user.addMessage(dmtpMessage);
                 }
             }

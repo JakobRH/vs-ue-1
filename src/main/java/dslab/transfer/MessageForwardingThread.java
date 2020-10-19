@@ -15,15 +15,16 @@ public class MessageForwardingThread extends Thread {
 
 
     private ArrayList<String> mailboxServers = new ArrayList<>();
-    private  Config domainConfig = new Config("domains");
+    private Config domainConfig = new Config("domains");
     private DmtpMessage dmtpMessage;
     private boolean forwardingSuccess = true; //flag to see if a message could not be sent
     private Config serverConfig;
 
     /**
      * creates new MessageForwardingThread
+     *
      * @param dmtpMessage dmtp info to send to mailbox servers
-     * @param config config to read out needed data for the server
+     * @param config      config to read out needed data for the server
      */
     public MessageForwardingThread(DmtpMessage dmtpMessage, Config config) {
         this.dmtpMessage = dmtpMessage;
@@ -41,19 +42,26 @@ public class MessageForwardingThread extends Thread {
     @Override
     public void run() {
 
-            for (String mailboxServer : mailboxServers) {
-
+        for (String mailboxServer : mailboxServers) {
+            for (String address : dmtpMessage.getTo().split(",")) {
+                if(address.split("@")[1].equals(mailboxServer)){
                     sendMessage(mailboxServer, dmtpMessage);
+                    break;
                 }
 
-            if(!forwardingSuccess) {
-                sendErrorMessageToSender(dmtpMessage.getFrom());
             }
+
+        }
+
+        if (!forwardingSuccess) {
+            sendErrorMessageToSender(dmtpMessage.getFrom());
+        }
 
     }
 
     /**
      * sends information about sender and transferserver to the monitoring server
+     *
      * @param sender sender
      */
     private void sendMonitoringStatistics(String sender) {
@@ -91,6 +99,7 @@ public class MessageForwardingThread extends Thread {
 
     /**
      * tries to inform the sender, by connecting to the right mailboxserver(if present) and sending the error message
+     *
      * @param sender sender
      */
     private void sendErrorMessageToSender(String sender) {
@@ -115,7 +124,8 @@ public class MessageForwardingThread extends Thread {
 
     /**
      * tries to send message to mailboxserver
-     * @param mailboxServer mailboxserver
+     *
+     * @param mailboxServer  mailboxserver
      * @param tmpDmtpMessage dmtp to send
      */
     private void sendMessage(String mailboxServer, DmtpMessage tmpDmtpMessage) {
@@ -124,6 +134,7 @@ public class MessageForwardingThread extends Thread {
 
         try {
             socket = new Socket(mailboxAddress[0], Integer.parseInt(mailboxAddress[1]));
+
 
             BufferedReader serverReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter serverWriter = new PrintWriter(socket.getOutputStream());
@@ -136,16 +147,17 @@ public class MessageForwardingThread extends Thread {
             boolean dataSent = false;//flag to see if data command was already sent
             boolean dtmpSuccessful = false;//flag to see if dmtp was successfull sent to mailboxserver
 
+
             while (!this.isInterrupted()) {
                 response = serverReader.readLine();
-                if(response == null) {
+                if (response == null) {
                     break;
                 }
-                if(response.equals("")) {
+                if (response.equals("")) {
                     continue;
                 }
 
-                if ((!response.equals("ok DMTP") && !serverDmtpAccept) || !response.startsWith("ok")) {
+                if ((!response.equals("ok DMTP") && !serverDmtpAccept) || !response.startsWith("ok") || response.equals("ok bye")) {
                     forwardingSuccess = false;
                     break;
                 }
@@ -157,25 +169,25 @@ public class MessageForwardingThread extends Thread {
                     continue;
                 }
                 if (!toSent) {
-                    serverWriter.println(tmpDmtpMessage.getTo());
+                    serverWriter.println("to " + tmpDmtpMessage.getTo());
                     serverWriter.flush();
                     toSent = true;
                     continue;
                 }
                 if (!fromSent) {
-                    serverWriter.println(tmpDmtpMessage.getFrom());
+                    serverWriter.println("from " + tmpDmtpMessage.getFrom());
                     serverWriter.flush();
                     fromSent = true;
                     continue;
                 }
                 if (!subjectSent) {
-                    serverWriter.println(tmpDmtpMessage.getSubject());
+                    serverWriter.println("subject " + tmpDmtpMessage.getSubject());
                     serverWriter.flush();
                     subjectSent = true;
                     continue;
                 }
                 if (!dataSent) {
-                    serverWriter.println(tmpDmtpMessage);
+                    serverWriter.println("data " + tmpDmtpMessage.getData());
                     serverWriter.flush();
                     dataSent = true;
                     continue;
