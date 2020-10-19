@@ -27,7 +27,7 @@ public class MailboxListenerThreadTransfer extends Thread {
 
         try {
 
-            while (true) {
+            while (!this.isInterrupted()) {
                 // wait for Client to connect
                 Socket socket = serverSocket.accept();
                 transferExecutorService

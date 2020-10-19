@@ -5,18 +5,19 @@ import dslab.util.DmtpMessage;
 
 import java.io.*;
 import java.net.*;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 /**
  * represents thread to handle messageforwarding
  */
-public class MessageForwardingThread implements Runnable {
+public class MessageForwardingThread extends Thread {
 
 
-    private final static String[] mailboxServers = {"earth.planet", "univer.ze"}; //could be made dynamically
-    private final static Config domainConfig = new Config("domains");
+    private ArrayList<String> mailboxServers = new ArrayList<>();
+    private  Config domainConfig = new Config("domains");
     private DmtpMessage dmtpMessage;
-    private boolean forwardingSuccess = true; //flag to see if a message coult not be sent
+    private boolean forwardingSuccess = true; //flag to see if a message could not be sent
     private Config serverConfig;
 
     /**
@@ -27,6 +28,10 @@ public class MessageForwardingThread implements Runnable {
     public MessageForwardingThread(DmtpMessage dmtpMessage, Config config) {
         this.dmtpMessage = dmtpMessage;
         this.serverConfig = config;
+
+        ResourceBundle bundle = ResourceBundle.getBundle("domains");
+
+        mailboxServers.addAll(bundle.keySet());
     }
 
     /**
@@ -131,7 +136,14 @@ public class MessageForwardingThread implements Runnable {
             boolean dataSent = false;//flag to see if data command was already sent
             boolean dtmpSuccessful = false;//flag to see if dmtp was successfull sent to mailboxserver
 
-            while ((response = serverReader.readLine()) != null) {
+            while (!this.isInterrupted()) {
+                response = serverReader.readLine();
+                if(response == null) {
+                    break;
+                }
+                if(response.equals("")) {
+                    continue;
+                }
 
                 if ((!response.equals("ok DMTP") && !serverDmtpAccept) || !response.startsWith("ok")) {
                     forwardingSuccess = false;

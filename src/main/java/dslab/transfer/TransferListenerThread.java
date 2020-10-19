@@ -35,7 +35,7 @@ public class TransferListenerThread extends Thread {
     public void run() {
         try {
 
-            while (true) {
+            while (!this.isInterrupted()) {
                 // wait for Client to connect
                 Socket socket = serverSocket.accept();
                 requestExecutorService

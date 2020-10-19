@@ -22,7 +22,7 @@ public class MonitoringListenerThread extends Thread {
         DatagramPacket packet;
 
         try {
-            while (true) {
+            while (!this.isInterrupted()) {
 
                 buffer = new byte[1024];
                 packet = new DatagramPacket(buffer, buffer.length);

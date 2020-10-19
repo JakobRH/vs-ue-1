@@ -1,13 +1,13 @@
 package dslab.mailbox;
 
-import dslab.transfer.MessageForwardingThread;
 import dslab.util.DmtpMessage;
 
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
 
-public class TransferRequestThread implements Runnable {
+public class TransferRequestThread extends Thread {
 
     private UserData userData;
     private Socket socket;
@@ -18,8 +18,6 @@ public class TransferRequestThread implements Runnable {
         this.userData = userData;
     }
 
-    @SuppressWarnings("DuplicatedCode")
-    @Override
     public void run() {
         try {
 
@@ -34,7 +32,14 @@ public class TransferRequestThread implements Runnable {
             boolean beginFlag = false;
 
             //waiting for new request
-            while ((request = reader.readLine()) != null) {
+            while (!this.isInterrupted()) {
+                request = reader.readLine();
+                if(request == null) {
+                    break;
+                }
+                if(request.equals("")) {
+                    continue;
+                }
                 String response;
 
                 //if the starts of the dmtp exchange starts wrong (not with "begin")
@@ -55,8 +60,9 @@ public class TransferRequestThread implements Runnable {
 
                 if (request.split(" ", 2)[0].equals("to")) {
                     dmtpMessage.setTo(request.split(" ", 2)[1]);
-                    if(!userAvailable()){
-                        writer.println("error no recipient known");
+                    ArrayList<String> unknownRecipients = userAvailable();
+                    if(!unknownRecipients.isEmpty()){
+                        writer.println("error  unknown  recipient" + String.join(" ",unknownRecipients));
                         writer.flush();
                         break;
                     }
@@ -120,7 +126,6 @@ public class TransferRequestThread implements Runnable {
      * @param request
      * @return
      */
-    @SuppressWarnings("DuplicatedCode")
     private String checkRequest(String request) {
         String[] splitRequest = request.split(" ", 2);
 
@@ -139,10 +144,14 @@ public class TransferRequestThread implements Runnable {
         return "error  protocol  error";
     }
 
-    private boolean userAvailable(){
+    private ArrayList<String> userAvailable(){
+        ArrayList<String> result = new ArrayList<>();
         for(String userId : dmtpMessage.getTo().split(",")){
-            if(userData.contains(userId)) return true;
+            if(!userData.contains(userId))
+            {
+                result.add(userId);
+            };
         }
-        return false;
+        return result;
     }
 }

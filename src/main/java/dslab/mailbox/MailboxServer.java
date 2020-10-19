@@ -29,6 +29,8 @@ public class MailboxServer implements IMailboxServer, Runnable {
     private ExecutorService userExecutorService = Executors.newFixedThreadPool(10);
     private Shell shell;
     private String componentId;
+    private MailboxListenerThreadTransfer mailboxListenerThreadTransfer;
+    private MailboxListenerThreadUser mailboxListenerThreadUser;
 
     /**
      * Creates a new server instance.
@@ -52,10 +54,12 @@ public class MailboxServer implements IMailboxServer, Runnable {
     public void run() {
         try {
             transferServerSocket = new ServerSocket(config.getInt("dmtp.tcp.port"));
-            new MailboxListenerThreadTransfer(transferServerSocket, config, transferExecutorService, userData).start();
+            mailboxListenerThreadTransfer =  new MailboxListenerThreadTransfer(transferServerSocket, config, transferExecutorService, userData);
+            mailboxListenerThreadTransfer.start();
 
             userServerSocket = new ServerSocket(config.getInt("dmap.tcp.port"));
-            new MailboxListenerThreadUser(userServerSocket, config, userExecutorService, userData).start();
+            mailboxListenerThreadUser =new MailboxListenerThreadUser(userServerSocket, config, userExecutorService, userData);
+            mailboxListenerThreadUser.start();
 
         } catch (IOException e) {
             throw new UncheckedIOException("Error while creating server socket", e);
@@ -68,6 +72,8 @@ public class MailboxServer implements IMailboxServer, Runnable {
     @Override
     public void shutdown() {
         try {
+            mailboxListenerThreadTransfer.interrupt();
+            mailboxListenerThreadUser.interrupt();
             userExecutorService.shutdownNow();
             transferExecutorService.shutdownNow();
             userServerSocket.close();

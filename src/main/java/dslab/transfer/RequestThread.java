@@ -11,7 +11,7 @@ import java.util.concurrent.ExecutorService;
 /**
  * represents thread to handle a client connection to the transferserver
  */
-public class RequestThread implements Runnable {
+public class RequestThread extends Thread {
 
     private ExecutorService messageForwardingExecutorService;
     private Socket socket;
@@ -34,7 +34,6 @@ public class RequestThread implements Runnable {
     /**
      * method that exchanges messages with the client via dmtp
      */
-    @Override
     public void run() {
         try {
 
@@ -49,7 +48,14 @@ public class RequestThread implements Runnable {
             boolean beginFlag = false;
 
             //waiting for new request
-            while ((request = reader.readLine()) != null) {
+            while (!this.isInterrupted()) {
+                request = reader.readLine();
+                if(request == null) {
+                    break;
+                }
+                if(request.equals("")) {
+                    continue;
+                }
                 String response;
 
                 //if the starts of the dmtp exchange starts wrong (not with "begin")
