@@ -12,6 +12,9 @@ import java.io.PrintStream;
 import java.net.DatagramSocket;
 import java.util.Map;
 
+/**
+ * Represents a MonitoringServer
+ */
 public class MonitoringServer implements IMonitoringServer {
 
     private Config config;
@@ -36,6 +39,16 @@ public class MonitoringServer implements IMonitoringServer {
         shell.register(this);
     }
 
+    public static void main(String[] args) throws Exception {
+        IMonitoringServer server = ComponentFactory
+                .createMonitoringServer(args[0], System.in, System.out);
+        server.run();
+    }
+
+    /**
+     * creates a datagramsocket and starts a new thread to accept the datagram  packets
+     * starts the shell
+     */
     @Override
     public void run() {
 
@@ -49,6 +62,9 @@ public class MonitoringServer implements IMonitoringServer {
         shell.run();
     }
 
+    /**
+     * returns the data stored in statistics via shell
+     */
     @Command
     @Override
     public void addresses() {
@@ -62,6 +78,9 @@ public class MonitoringServer implements IMonitoringServer {
         }
     }
 
+    /**
+     * returns the data stored in statistics via shell
+     */
     @Command
     @Override
     public void servers() {
@@ -74,17 +93,16 @@ public class MonitoringServer implements IMonitoringServer {
         }
     }
 
+    /**
+     * interrupts the thread that accepts the datagram packets
+     * closes the datagram socket and shuts the shell down
+     * postcondition: all resources used by this server are closed/free
+     */
     @Command
     @Override
     public void shutdown() {
         monitoringListenerThread.interrupt();
         datagramSocket.close();
         throw new StopShellException();
-    }
-
-    public static void main(String[] args) throws Exception {
-        IMonitoringServer server = ComponentFactory
-                .createMonitoringServer(args[0], System.in, System.out);
-        server.run();
     }
 }

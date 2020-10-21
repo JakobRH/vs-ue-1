@@ -8,8 +8,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
+/**
+ * Represents a TransferListenerThread. Aim of this thread it to accept connection on this server socket and
+ * start a new thread handeling the connection.
+ */
 public class TransferListenerThread extends Thread {
 
     private ExecutorService requestExecutorService;
@@ -19,8 +22,9 @@ public class TransferListenerThread extends Thread {
 
     /**
      * creates new Trasnferlistener
+     *
      * @param serverSocket socket to wait for new connection
-     * @param config cnofig to pass to new created threads
+     * @param config       cnofig to pass to new created threads
      */
     public TransferListenerThread(ServerSocket serverSocket, Config config, ExecutorService requestExecutorService, ExecutorService messageForwardingExecutorService) {
         this.serverSocket = serverSocket;
@@ -30,13 +34,12 @@ public class TransferListenerThread extends Thread {
     }
 
     /**
-     * waits for new connection on serversocket, then creates new socket and starts a thread to handle the connection
+     * waits for new connection on serversocket, then creates new socket and starts a thread to handle the connection.
      */
     public void run() {
         try {
 
             while (!this.isInterrupted()) {
-                // wait for Client to connect
                 Socket socket = serverSocket.accept();
                 requestExecutorService
                         .submit(new RequestThread(socket, this.messageForwardingExecutorService, config));

@@ -17,9 +17,10 @@ public class DmtpMessage {
 
     /**
      * creates new dmtp object
-     * @param from sender
+     *
+     * @param from    sender
      * @param subject subject
-     * @param data data
+     * @param data    data
      */
     public DmtpMessage(String from, String to, String subject, String data) {
         this.to = to;
@@ -30,6 +31,7 @@ public class DmtpMessage {
 
     /**
      * Checks if the information is enough to make a correct dmtp
+     *
      * @return "sendable" if the dtmp object is ready to send, otherwise error message with information on whats missing
      */
     public String isValidToSend() {

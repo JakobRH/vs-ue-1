@@ -5,18 +5,28 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 
+/**
+ * Represents a UserRequestThread. Aim of this thread is to handle the serverside of a dmap communication.
+ */
 public class UserRequestThread extends Thread {
 
     private UserData userData;
     private Socket socket;
     private String userId;
 
-
+    /**
+     * Creates new instance of UserRequestThread.
+     * @param socket the socket to listen to.
+     * @param userData the data structure of this server.
+     */
     public UserRequestThread(Socket socket, UserData userData) {
         this.userData = userData;
         this.socket = socket;
     }
 
+    /**
+     * Handles the dmap communication of the client connection.
+     */
     public void run() {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -40,7 +50,7 @@ public class UserRequestThread extends Thread {
                 }
 
                 if (request.startsWith("login")) {
-                    if(loggedIn){
+                    if (loggedIn) {
                         writer.println("error already logged in");
                         writer.flush();
                         continue;
@@ -57,36 +67,36 @@ public class UserRequestThread extends Thread {
                     continue;
                 }
 
-                if(request.equals("quit")){
+                if (request.equals("quit")) {
                     writer.println("ok bye");
                     writer.flush();
                     break;
                 }
 
-                if (!loggedIn){
+                if (!loggedIn) {
                     writer.println("error not logged in");
                     writer.flush();
                     continue;
                 }
 
-                if(request.equals("list")){
+                if (request.equals("list")) {
                     ArrayList<String> list = userData.list(userId);
-                    for(String entry : list){
+                    for (String entry : list) {
                         writer.println(entry);
                         writer.flush();
                     }
                 }
 
-                if(request.startsWith("show")){
+                if (request.startsWith("show")) {
                     String messageId = request.split(" ")[1];
                     ArrayList<String> list = userData.show(userId, messageId);
-                    for(String entry : list){
+                    for (String entry : list) {
                         writer.println(entry);
                         writer.flush();
                     }
                 }
 
-                if(request.startsWith("delete")){
+                if (request.startsWith("delete")) {
                     String messageId = request.split(" ")[1];
                     String response = userData.delete(userId, messageId);
                     writer.println(response);
@@ -94,7 +104,7 @@ public class UserRequestThread extends Thread {
 
                 }
 
-                if(request.equals("logout")){
+                if (request.equals("logout")) {
                     loggedIn = false;
                     userId = "";
                     writer.println("ok");

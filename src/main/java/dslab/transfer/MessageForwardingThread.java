@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 /**
- * represents thread to handle messageforwarding
+ * Represents a MessageForwardingThread. Its aim is to send the messages to the according Mailboxservers and
+ * to send statistics about successful sent data to a Monitoring Server
  */
 public class MessageForwardingThread extends Thread {
 
@@ -18,6 +19,7 @@ public class MessageForwardingThread extends Thread {
     private Config domainConfig = new Config("domains");
     private DmtpMessage dmtpMessage;
     private boolean forwardingSuccess = true; //flag to see if a message could not be sent
+    private boolean foundMailboxServer = false; // flag to see if there was any mailboxserver matching a to-address
     private Config serverConfig;
 
     /**
@@ -44,7 +46,9 @@ public class MessageForwardingThread extends Thread {
 
         for (String mailboxServer : mailboxServers) {
             for (String address : dmtpMessage.getTo().split(",")) {
-                if(address.split("@")[1].equals(mailboxServer)){
+                //checks if any of the to-addresses has a domain matching the mailboxserver
+                if (address.split("@")[1].equals(mailboxServer)) {
+                    foundMailboxServer = true;
                     sendMessage(mailboxServer, dmtpMessage);
                     break;
                 }
@@ -53,7 +57,9 @@ public class MessageForwardingThread extends Thread {
 
         }
 
-        if (!forwardingSuccess) {
+        //if forwardingSuccess is false, there was a problem sending the message
+        //if foundMailboxServer is false, there was no matching domain to the to-addresses
+        if (!forwardingSuccess || !foundMailboxServer) {
             sendErrorMessageToSender(dmtpMessage.getFrom());
         }
 
@@ -68,7 +74,7 @@ public class MessageForwardingThread extends Thread {
         DatagramSocket socket = null;
         try {
             InetAddress address = InetAddress.getLocalHost();
-            String hostIP = address.getHostAddress();
+            String hostIP = address.getHostAddress(); //ip of the machine the server is running
 
             socket = new DatagramSocket();
 
@@ -100,7 +106,7 @@ public class MessageForwardingThread extends Thread {
     /**
      * tries to inform the sender, by connecting to the right mailboxserver(if present) and sending the error message
      *
-     * @param sender sender
+     * @param sender a mail address e.g. max@mustermann.at
      */
     private void sendErrorMessageToSender(String sender) {
 

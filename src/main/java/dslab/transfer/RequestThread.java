@@ -9,7 +9,8 @@ import java.net.SocketException;
 import java.util.concurrent.ExecutorService;
 
 /**
- * represents thread to handle a client connection to the transferserver
+ * Represents a RequestThread to handle a client connection of the transferserver. When receiving correct dmtp
+ * commands, a MessageforwardingThread will be started to forward the received data.
  */
 public class RequestThread extends Thread {
 
@@ -20,9 +21,10 @@ public class RequestThread extends Thread {
 
     /**
      * creates new RequestThread
-     * @param socket socket on which the connection to the client is based
+     *
+     * @param socket                           socket on which the connection to the client is based
      * @param messageForwardingExecutorService executorservice to handle the threads of messageforwarding
-     * @param config config to pass on messageforwarding threads
+     * @param config                           config to pass on messageforwarding threads
      */
     public RequestThread(Socket socket, ExecutorService messageForwardingExecutorService, Config config) {
         this.messageForwardingExecutorService = messageForwardingExecutorService;
@@ -32,7 +34,7 @@ public class RequestThread extends Thread {
 
 
     /**
-     * method that exchanges messages with the client via dmtp
+     * Exchanges messages with the client via dmtp.
      */
     public void run() {
         try {
@@ -45,15 +47,15 @@ public class RequestThread extends Thread {
             writer.flush();
 
             String request;
-            boolean beginFlag = false;
+            boolean beginFlag = false; //flag ot see if dmtp was started properly with the "begin" command
 
             //waiting for new request
             while (!this.isInterrupted()) {
                 request = reader.readLine();
-                if(request == null) {
+                if (request == null) {
                     break;
                 }
-                if(request.equals("")) {
+                if (request.equals("")) {
                     continue;
                 }
                 String response;
@@ -128,9 +130,10 @@ public class RequestThread extends Thread {
 
     /**
      * checks if the request has valid data for dmtp, if wrong command is received error message will be returned
-     * if the reqeust is valid, the data will be added to the dmtp object
-     * @param request
-     * @return
+     * if the request is valid, the data will be added to the dmtp object
+     *
+     * @param request request
+     * @return appropriate response to the received request
      */
     private String checkRequest(String request) {
         String[] splitRequest = request.split(" ", 2);
